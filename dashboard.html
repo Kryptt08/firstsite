@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BGS.GG Admin Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d0b1a; --surface: #16132a; --card: #1e1a35; --border: #2e2850;
+      --pink: #ff4fa3; --purple: #a855f7; --blue: #38bdf8; --yellow: #fbbf24;
+      --green: #34d399; --red: #f87171;
+      --text: #f0eaff; --muted: #8b80b0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Nunito', sans-serif; min-height: 100vh; }
+
+    /* NAV */
+    nav {
+      background: rgba(13,11,26,0.95); border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; padding: 0 28px; height: 60px; gap: 20px;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .nav-logo {
+      font-family: 'Baloo 2', cursive; font-size: 1.3rem; font-weight: 800;
+      background: linear-gradient(90deg, var(--pink), var(--purple));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-right: auto;
+    }
+    .nav-user { color: var(--muted); font-size: 0.85rem; font-weight: 600; }
+    .nav-logout {
+      color: var(--red); font-size: 0.85rem; font-weight: 700;
+      text-decoration: none; padding: 6px 14px; border: 1px solid rgba(248,113,113,0.3);
+      border-radius: 8px; transition: all 0.2s;
+    }
+    .nav-logout:hover { background: rgba(248,113,113,0.1); }
+
+    /* LAYOUT */
+    .layout { display: grid; grid-template-columns: 1fr 340px; gap: 24px; max-width: 1300px; margin: 0 auto; padding: 28px; }
+    @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+
+    /* CARDS */
+    .panel {
+      background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
+    }
+    .panel-header {
+      padding: 18px 22px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .panel-title {
+      font-family: 'Baloo 2', cursive; font-size: 1.15rem; font-weight: 800;
+    }
+
+    /* BUTTONS */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.8rem;
+      padding: 7px 16px; border-radius: 8px; border: none; cursor: pointer; transition: all 0.18s;
+    }
+    .btn-primary { background: linear-gradient(135deg, var(--pink), var(--purple)); color: #fff; }
+    .btn-primary:hover { opacity: 0.88; }
+    .btn-sm { padding: 5px 12px; font-size: 0.75rem; }
+    .btn-edit { background: rgba(168,85,247,0.15); color: var(--purple); border: 1px solid rgba(168,85,247,0.3); }
+    .btn-edit:hover { background: rgba(168,85,247,0.25); }
+    .btn-delete { background: rgba(248,113,113,0.12); color: var(--red); border: 1px solid rgba(248,113,113,0.25); }
+    .btn-delete:hover { background: rgba(248,113,113,0.22); }
+    .btn-save { background: rgba(52,211,153,0.15); color: var(--green); border: 1px solid rgba(52,211,153,0.3); }
+    .btn-save:hover { background: rgba(52,211,153,0.25); }
+
+    /* FILTERS */
+    .filter-bar {
+      padding: 14px 22px; border-bottom: 1px solid var(--border);
+      display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+    }
+    .filter-bar input {
+      flex: 1; min-width: 160px; background: var(--surface); border: 1px solid var(--border);
+      color: var(--text); font-family: 'Nunito', sans-serif; font-size: 0.85rem;
+      padding: 7px 14px; border-radius: 8px; outline: none;
+    }
+    .filter-bar input:focus { border-color: var(--purple); }
+    .filter-tab {
+      padding: 6px 14px; border-radius: 8px; font-size: 0.75rem; font-weight: 700;
+      background: var(--surface); border: 1px solid var(--border); color: var(--muted);
+      cursor: pointer; transition: all 0.18s; text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .filter-tab.active { background: rgba(168,85,247,0.2); border-color: var(--purple); color: var(--purple); }
+
+    /* PET TABLE */
+    .pet-table { width: 100%; border-collapse: collapse; }
+    .pet-table th {
+      text-align: left; padding: 10px 16px; font-size: 0.72rem; font-weight: 700;
+      color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em;
+      border-bottom: 1px solid var(--border);
+    }
+    .pet-table td { padding: 10px 16px; border-bottom: 1px solid rgba(46,40,80,0.5); vertical-align: middle; }
+    .pet-table tr:last-child td { border-bottom: none; }
+    .pet-table tr:hover td { background: rgba(168,85,247,0.04); }
+
+    .rarity-badge {
+      display: inline-block; padding: 2px 8px; border-radius: 6px;
+      font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .r-limited   { background: rgba(255,79,163,0.15); color: var(--pink); border: 1px solid rgba(255,79,163,0.3); }
+    .r-secret    { background: rgba(239,68,68,0.15);  color: var(--red);  border: 1px solid rgba(239,68,68,0.3); }
+    .r-legendary { background: rgba(251,191,36,0.15); color: var(--yellow); border: 1px solid rgba(251,191,36,0.3); }
+    .r-rare      { background: rgba(56,189,248,0.12); color: var(--blue); border: 1px solid rgba(56,189,248,0.25); }
+
+    /* INLINE EDIT */
+    .inline-value {
+      display: flex; align-items: center; gap: 6px;
+    }
+    .value-display { font-family: 'Baloo 2', cursive; font-weight: 700; color: var(--yellow); }
+    .edit-form { display: none; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .edit-form input {
+      width: 90px; background: var(--surface); border: 1px solid var(--purple);
+      color: var(--text); font-family: 'Nunito', sans-serif; font-size: 0.85rem;
+      padding: 5px 10px; border-radius: 7px; outline: none;
+    }
+    .edit-form input.reason-input { width: 140px; }
+
+    /* HISTORY SIDEBAR */
+    .history-list { padding: 0; }
+    .history-item {
+      padding: 13px 20px; border-bottom: 1px solid rgba(46,40,80,0.5);
+      font-size: 0.82rem;
+    }
+    .history-item:last-child { border-bottom: none; }
+    .history-pet { font-weight: 800; color: var(--text); }
+    .history-change { margin-top: 3px; }
+    .old-val { color: var(--muted); text-decoration: line-through; }
+    .new-val { color: var(--green); font-weight: 700; }
+    .history-meta { color: var(--muted); font-size: 0.72rem; margin-top: 4px; }
+    .history-reason { color: var(--blue); font-style: italic; }
+
+    /* ADD PET MODAL */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.7); z-index: 200;
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 20px; padding: 32px; width: 100%; max-width: 460px;
+    }
+    .modal h2 { font-family: 'Baloo 2', cursive; font-size: 1.3rem; font-weight: 800; margin-bottom: 22px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label {
+      display: block; font-size: 0.75rem; font-weight: 700; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px;
+    }
+    .form-group input, .form-group select {
+      width: 100%; background: var(--surface); border: 1px solid var(--border);
+      color: var(--text); font-family: 'Nunito', sans-serif; font-size: 0.9rem;
+      padding: 10px 14px; border-radius: 10px; outline: none; transition: border-color 0.2s;
+    }
+    .form-group input:focus, .form-group select:focus { border-color: var(--purple); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 22px; justify-content: flex-end; }
+    .btn-cancel { background: var(--surface); color: var(--muted); border: 1px solid var(--border); }
+
+    /* TOAST */
+    .toast {
+      position: fixed; bottom: 28px; right: 28px; z-index: 300;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px 20px; font-weight: 700; font-size: 0.875rem;
+      transform: translateY(80px); opacity: 0; transition: all 0.3s;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { border-color: rgba(52,211,153,0.4); color: var(--green); }
+    .toast.error   { border-color: rgba(248,113,113,0.4); color: var(--red); }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">BGS.GG Admin</div>
+  <span class="nav-user">Logged in as <strong>{{ user }}</strong></span>
+  <a href="/admin/logout" class="nav-logout">Log Out</a>
+</nav>
+
+<div class="layout">
+
+  <!-- MAIN: PET TABLE -->
+  <div>
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Pet Values</div>
+        <button class="btn btn-primary" onclick="openAddModal()">+ Add Pet</button>
+      </div>
+      <div class="filter-bar">
+        <input type="text" id="searchInput" placeholder="Search pets…" oninput="filterTable()">
+        <button class="filter-tab active" onclick="setRarityFilter('all', this)">All</button>
+        <button class="filter-tab" onclick="setRarityFilter('Limited', this)">Limited</button>
+        <button class="filter-tab" onclick="setRarityFilter('Secret', this)">Secret</button>
+        <button class="filter-tab" onclick="setRarityFilter('Legendary', this)">Legendary</button>
+        <button class="filter-tab" onclick="setRarityFilter('Rare', this)">Rare</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="pet-table" id="petTable">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Rarity</th>
+              <th>Value</th>
+              <th>Shiny Value</th>
+              <th>Note</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for pet in pets %}
+            <tr data-rarity="{{ pet['rarity'] }}" data-name="{{ pet['name']|lower }}">
+              <td style="font-weight:700;">{{ pet['name'] }}</td>
+              <td>
+                <span class="rarity-badge r-{{ pet['rarity']|lower }}">{{ pet['rarity'] }}</span>
+              </td>
+              <td>
+                <div class="inline-value" id="row-{{ pet['id'] }}">
+                  <span class="value-display">{{ pet['value'] }}%</span>
+                  <div class="edit-form" id="edit-{{ pet['id'] }}">
+                    <input type="number" step="0.01" min="0" placeholder="Value" value="{{ pet['value'] }}" id="val-{{ pet['id'] }}">
+                    <input type="number" step="0.01" min="0" placeholder="Shiny" value="{{ pet['shiny_value'] or '' }}" id="shiny-{{ pet['id'] }}">
+                    <input type="text" placeholder="Reason (optional)" class="reason-input" id="reason-{{ pet['id'] }}">
+                    <button class="btn btn-sm btn-save" onclick="saveValue({{ pet['id'] }})">Save</button>
+                    <button class="btn btn-sm btn-cancel" onclick="cancelEdit({{ pet['id'] }})">Cancel</button>
+                  </div>
+                </div>
+              </td>
+              <td style="color:var(--blue);font-weight:700;">
+                {{ pet['shiny_value'] ~ '%' if pet['shiny_value'] is not none else '—' }}
+              </td>
+              <td style="color:var(--muted);font-size:0.82rem;">{{ pet['note'] or '—' }}</td>
+              <td>
+                <div style="display:flex;gap:6px;">
+                  <button class="btn btn-sm btn-edit" onclick="startEdit({{ pet['id'] }})">Edit</button>
+                  <button class="btn btn-sm btn-delete" onclick="deletePet({{ pet['id'] }}, '{{ pet['name'] }}')">Delete</button>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIDEBAR: HISTORY -->
+  <div>
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Recent Changes</div>
+      </div>
+      <div class="history-list" id="historyList">
+        {% for h in recent %}
+        <div class="history-item">
+          <div class="history-pet">{{ h['pet_name'] }}</div>
+          <div class="history-change">
+            <span class="old-val">{{ h['old_value'] }}%</span>
+            &nbsp;→&nbsp;
+            <span class="new-val">{{ h['new_value'] }}%</span>
+          </div>
+          {% if h['reason'] %}
+          <div class="history-reason">"{{ h['reason'] }}"</div>
+          {% endif %}
+          <div class="history-meta">{{ h['changed_at'][:16] }} · by {{ h['changed_by'] }}</div>
+        </div>
+        {% else %}
+        <div style="padding:24px;text-align:center;color:var(--muted);font-size:0.875rem;">No changes yet</div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ADD PET MODAL -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <h2>Add New Pet</h2>
+    <div class="form-group">
+      <label>Pet Name</label>
+      <input type="text" id="newName" placeholder="e.g. Crystal Dragon">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Rarity</label>
+        <select id="newRarity">
+          <option value="Limited">Limited</option>
+          <option value="Secret">Secret</option>
+          <option value="Legendary">Legendary</option>
+          <option value="Rare">Rare</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Value (%)</label>
+        <input type="number" id="newValue" placeholder="0" min="0" step="0.01" value="0">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Shiny Value (%)</label>
+        <input type="number" id="newShiny" placeholder="0" min="0" step="0.01" value="0">
+      </div>
+      <div class="form-group">
+        <label>Note (optional)</label>
+        <input type="text" id="newNote" placeholder="e.g. Event only">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-cancel" onclick="closeAddModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="addPet()">Add Pet</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  let rarityFilter = 'all';
+
+  function setRarityFilter(r, btn) {
+    rarityFilter = r;
+    document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filterTable();
+  }
+
+  function filterTable() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    document.querySelectorAll('#petTable tbody tr').forEach(row => {
+      const nameMatch = row.dataset.name.includes(q);
+      const rarityMatch = rarityFilter === 'all' || row.dataset.rarity === rarityFilter;
+      row.style.display = (nameMatch && rarityMatch) ? '' : 'none';
+    });
+  }
+
+  function startEdit(id) {
+    document.querySelectorAll('.edit-form').forEach(f => f.style.display = 'none');
+    const form = document.getElementById(`edit-${id}`);
+    form.style.display = 'flex';
+  }
+
+  function cancelEdit(id) {
+    document.getElementById(`edit-${id}`).style.display = 'none';
+  }
+
+  async function saveValue(id) {
+    const value  = parseFloat(document.getElementById(`val-${id}`).value) || 0;
+    const shiny  = document.getElementById(`shiny-${id}`).value;
+    const reason = document.getElementById(`reason-${id}`).value;
+
+    const res = await fetch(`/admin/pets/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        value,
+        shiny_value: shiny ? parseFloat(shiny) : null,
+        reason: reason || null,
+      }),
+    });
+
+    if (res.ok) {
+      showToast('Value updated!', 'success');
+      setTimeout(() => location.reload(), 800);
+    } else {
+      const err = await res.json();
+      showToast(err.detail || 'Error updating', 'error');
+    }
+  }
+
+  async function deletePet(id, name) {
+    if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
+    const res = await fetch(`/admin/pets/${id}`, { method: 'DELETE' });
+    if (res.ok) {
+      showToast(`${name} deleted`, 'success');
+      setTimeout(() => location.reload(), 700);
+    } else {
+      showToast('Error deleting pet', 'error');
+    }
+  }
+
+  function openAddModal()  { document.getElementById('addModal').classList.add('open'); }
+  function closeAddModal() { document.getElementById('addModal').classList.remove('open'); }
+
+  async function addPet() {
+    const body = {
+      name:        document.getElementById('newName').value.trim(),
+      rarity:      document.getElementById('newRarity').value,
+      value:       parseFloat(document.getElementById('newValue').value) || 0,
+      shiny_value: parseFloat(document.getElementById('newShiny').value) || null,
+      note:        document.getElementById('newNote').value.trim() || null,
+    };
+    if (!body.name) { showToast('Name is required', 'error'); return; }
+
+    const res = await fetch('/admin/pets/add', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (res.ok) {
+      showToast(`${body.name} added!`, 'success');
+      closeAddModal();
+      setTimeout(() => location.reload(), 700);
+    } else {
+      const err = await res.json();
+      showToast(err.detail || 'Error adding pet', 'error');
+    }
+  }
+
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    t.textContent = type === 'success' ? '✓ ' + msg : '✗ ' + msg;
+    t.className = `toast ${type} show`;
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+</script>
+
+</body>
+</html>

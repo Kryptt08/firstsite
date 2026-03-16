@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pet Values – BGS.GG</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:       #0d0b1a;
+      --surface:  #16132a;
+      --card:     #1e1a35;
+      --border:   #2e2850;
+      --pink:     #ff4fa3;
+      --purple:   #a855f7;
+      --blue:     #38bdf8;
+      --yellow:   #fbbf24;
+      --green:    #34d399;
+      --text:     #f0eaff;
+      --muted:    #8b80b0;
+      --glow-pink: 0 0 20px rgba(255,79,163,0.35);
+      --glow-purple: 0 0 20px rgba(168,85,247,0.35);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: 'Nunito', sans-serif; min-height: 100vh; overflow-x: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        radial-gradient(1px 1px at 15% 20%, rgba(255,255,255,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 70% 60%, rgba(255,255,255,0.25) 0%, transparent 100%),
+        radial-gradient(2px 2px at 40% 80%, rgba(168,85,247,0.3) 0%, transparent 100%),
+        radial-gradient(2px 2px at 85% 30%, rgba(255,79,163,0.25) 0%, transparent 100%);
+      pointer-events: none; z-index: 0;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(13,11,26,0.88); backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 0;
+      padding: 0 24px; height: 62px;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; margin-right: auto; }
+    .nav-logo .logo-bubble { font-size: 28px; filter: drop-shadow(0 0 8px rgba(255,79,163,0.8)); }
+    .nav-logo span {
+      font-family: 'Baloo 2', cursive; font-size: 1.35rem; font-weight: 800;
+      background: linear-gradient(90deg, var(--pink), var(--purple));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .nav-links { display: flex; align-items: center; gap: 4px; }
+    .nav-links a {
+      display: flex; align-items: center; gap: 6px;
+      color: var(--muted); font-weight: 700; font-size: 0.875rem;
+      text-decoration: none; padding: 8px 14px; border-radius: 8px; transition: all 0.2s;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); background: rgba(168,85,247,0.15); }
+    .nav-links a.active { color: var(--purple); }
+    .nav-discord {
+      margin-left: 12px;
+      background: linear-gradient(135deg, #5865F2, #7983f5) !important;
+      color: #fff !important; border-radius: 8px !important; padding: 7px 14px !important;
+    }
+    .nav-lock {
+      margin-left: 8px; font-size: 16px; opacity: 0.35;
+      text-decoration: none; transition: opacity 0.2s; padding: 8px 6px;
+    }
+    .nav-lock:hover { opacity: 0.8; }
+
+    /* PAGE HEADER */
+    .page-header {
+      position: relative; z-index: 1;
+      padding: 48px 24px 32px; text-align: center;
+    }
+    .page-header h1 {
+      font-family: 'Baloo 2', cursive; font-size: 2.2rem; font-weight: 800;
+    }
+    .page-header h1 span {
+      background: linear-gradient(90deg, var(--pink), var(--purple));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .page-header p { color: var(--muted); margin-top: 8px; }
+
+    /* CONTROLS */
+    .controls {
+      position: relative; z-index: 1;
+      max-width: 1100px; margin: 0 auto; padding: 0 24px 24px;
+      display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+    }
+
+    .search-wrap {
+      flex: 1; min-width: 200px; position: relative;
+    }
+    .search-wrap input {
+      width: 100%; background: var(--card); border: 1px solid var(--border);
+      color: var(--text); font-family: 'Nunito', sans-serif; font-size: 0.9rem;
+      padding: 10px 16px 10px 40px; border-radius: 10px; outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-wrap input:focus { border-color: var(--purple); }
+    .search-wrap input::placeholder { color: var(--muted); }
+    .search-wrap .search-icon {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      font-size: 15px; pointer-events: none;
+    }
+
+    .filter-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .filter-btn {
+      background: var(--card); border: 1px solid var(--border);
+      color: var(--muted); font-family: 'Nunito', sans-serif; font-weight: 700;
+      font-size: 0.8rem; padding: 8px 16px; border-radius: 8px;
+      cursor: pointer; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .filter-btn:hover { border-color: var(--purple); color: var(--text); }
+    .filter-btn.active { background: rgba(168,85,247,0.2); border-color: var(--purple); color: var(--purple); }
+    .filter-btn.f-secret.active   { background: rgba(239,68,68,0.15);  border-color: #f87171; color: #f87171; }
+    .filter-btn.f-legendary.active { background: rgba(251,191,36,0.15); border-color: var(--yellow); color: var(--yellow); }
+    .filter-btn.f-limited.active  { background: rgba(255,79,163,0.15); border-color: var(--pink); color: var(--pink); }
+    .filter-btn.f-rare.active     { background: rgba(56,189,248,0.12); border-color: var(--blue); color: var(--blue); }
+
+    .sort-select {
+      background: var(--card); border: 1px solid var(--border);
+      color: var(--text); font-family: 'Nunito', sans-serif; font-weight: 700;
+      font-size: 0.8rem; padding: 8px 16px; border-radius: 8px; cursor: pointer; outline: none;
+      transition: border-color 0.2s;
+    }
+    .sort-select:focus { border-color: var(--purple); }
+
+    /* RESULTS INFO */
+    .results-info {
+      position: relative; z-index: 1;
+      max-width: 1100px; margin: 0 auto; padding: 0 24px 16px;
+      color: var(--muted); font-size: 0.85rem; font-weight: 600;
+    }
+
+    /* PET GRID */
+    .pets-grid {
+      position: relative; z-index: 1;
+      max-width: 1100px; margin: 0 auto; padding: 0 24px 80px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+      gap: 14px;
+    }
+
+    .pet-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 18px 14px; text-align: center;
+      transition: all 0.22s; cursor: pointer; text-decoration: none; color: var(--text);
+      display: block; animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .pet-card:hover {
+      border-color: var(--purple);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 32px rgba(168,85,247,0.2);
+    }
+    .pet-card.r-secret-card:hover   { border-color: #f87171; box-shadow: 0 8px 32px rgba(239,68,68,0.2); }
+    .pet-card.r-legendary-card:hover { border-color: var(--yellow); box-shadow: 0 8px 32px rgba(251,191,36,0.2); }
+    .pet-card.r-limited-card:hover  { border-color: var(--pink); box-shadow: 0 8px 32px rgba(255,79,163,0.2); }
+
+    .pet-img-wrap {
+      width: 80px; height: 80px; margin: 0 auto 12px;
+      border-radius: 14px; overflow: hidden; position: relative;
+      background: var(--surface); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .pet-img-wrap img {
+      width: 100%; height: 100%; object-fit: contain;
+    }
+    .pet-img-placeholder {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.6rem; font-weight: 800; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.08em;
+      text-align: center; padding: 6px;
+    }
+    .pet-img-placeholder.ph-limited  { background: linear-gradient(135deg, rgba(255,79,163,0.15), rgba(168,85,247,0.15)); }
+    .pet-img-placeholder.ph-secret   { background: linear-gradient(135deg, rgba(239,68,68,0.15), rgba(251,113,133,0.1)); }
+    .pet-img-placeholder.ph-legendary{ background: linear-gradient(135deg, rgba(251,191,36,0.15), rgba(245,158,11,0.1)); }
+    .pet-img-placeholder.ph-rare     { background: linear-gradient(135deg, rgba(56,189,248,0.12), rgba(14,165,233,0.1)); }
+
+    .pet-emoji { font-size: 42px; display: block; margin-bottom: 10px; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5)); }
+    .pet-name  { font-weight: 800; font-size: 0.875rem; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .rarity-tag {
+      display: inline-block; border-radius: 6px; padding: 2px 9px;
+      font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px;
+    }
+    .r-secret    { background: rgba(239,68,68,0.2);  color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+    .r-legendary { background: rgba(251,191,36,0.15); color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
+    .r-limited   { background: rgba(255,79,163,0.15); color: var(--pink); border: 1px solid rgba(255,79,163,0.3); }
+    .r-rare      { background: rgba(56,189,248,0.12); color: var(--blue); border: 1px solid rgba(56,189,248,0.25); }
+
+    .pet-value       { font-family: 'Baloo 2', cursive; font-size: 1.1rem; font-weight: 700; color: var(--yellow); }
+    .pet-value-shiny { font-size: 0.8rem; color: var(--blue); font-weight: 700; margin-top: 3px; }
+    .pet-value-label { color: var(--muted); font-size: 0.68rem; font-weight: 600; }
+
+    .shiny-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: rgba(56,189,248,0.12); border: 1px solid rgba(56,189,248,0.25);
+      border-radius: 6px; padding: 1px 7px; font-size: 0.65rem;
+      font-weight: 800; color: var(--blue); text-transform: uppercase; letter-spacing: 0.06em;
+      margin-bottom: 6px;
+    }
+
+    .no-results {
+      position: relative; z-index: 1;
+      text-align: center; padding: 60px 24px; color: var(--muted);
+      display: none;
+    }
+    .no-results .nr-emoji { font-size: 48px; display: block; margin-bottom: 12px; }
+    .no-results p { font-size: 1rem; font-weight: 600; }
+
+    footer {
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--border);
+      text-align: center; padding: 32px 24px;
+      color: var(--muted); font-size: 0.85rem;
+    }
+    footer a { color: var(--purple); text-decoration: none; }
+
+    @media (max-width: 600px) {
+      .nav-links a span { display: none; }
+      .pets-grid { grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <span class="logo-bubble">🫧</span>
+      <span>BGS.GG</span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html">
+        <span>Home</span>
+      </a>
+      <a href="pets.html" class="active">
+        <span>Pets</span>
+      </a>
+      <a href="#" class="nav-discord">
+        <span>Discord</span>
+      </a>
+      <a href="http://localhost:8000/admin/login" class="nav-lock" title="Admin" target="_blank">🔒</a>
+    </div>
+  </nav>
+
+  <div class="page-header">
+    <h1>Pet <span>Value List</span></h1>
+    <p>All OG Bubble Gum Simulator pets — sorted by community trade values</p>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <div class="search-wrap">
+      <span class="search-icon"></span>
+      <input type="text" id="searchInput" placeholder="Search pets…" oninput="filterPets()">
+    </div>
+    <div class="filter-row">
+      <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
+      <button class="filter-btn f-secret" onclick="setFilter('Secret', this)">Secret</button>
+      <button class="filter-btn f-legendary" onclick="setFilter('Legendary', this)">Legendary</button>
+      <button class="filter-btn f-limited" onclick="setFilter('Limited', this)">Limited</button>
+      <button class="filter-btn f-rare" onclick="setFilter('Rare', this)">Rare</button>
+    </div>
+    <select class="sort-select" id="sortSelect" onchange="filterPets()">
+      <option value="value-desc">Highest Value</option>
+      <option value="value-asc">Lowest Value</option>
+      <option value="name-asc">Name A–Z</option>
+      <option value="name-desc">Name Z–A</option>
+    </select>
+  </div>
+
+  <div class="results-info" id="resultsInfo">Showing all pets</div>
+
+  <!-- GRID -->
+  <div class="pets-grid" id="petsGrid"></div>
+  <div class="no-results" id="noResults">
+    <span class="nr-emoji"></span>
+    <p>No pets found. Try a different search.</p>
+  </div>
+
+  <footer>
+    <p>BGS.GG is a fan-made value list for OG Bubble Gum Simulator. Not affiliated with Rumble Studios.</p>
+    <p style="margin-top:8px;"><a href="#">Privacy Policy</a> · <a href="#">FAQ</a> · <a href="#">Discord</a></p>
+  </footer>
+
+  <script>
+    const API = 'http://localhost:8000';
+    let ALL_PETS = [];
+    let currentFilter = 'all';
+
+    function rarityClass(r) {
+      if (r === 'Secret')    return 'r-secret';
+      if (r === 'Legendary') return 'r-legendary';
+      if (r === 'Limited')   return 'r-limited';
+      return 'r-rare';
+    }
+    function cardRarityClass(r) {
+      if (r === 'Secret')    return 'r-secret-card';
+      if (r === 'Legendary') return 'r-legendary-card';
+      if (r === 'Limited')   return 'r-limited-card';
+      return '';
+    }
+    function formatValue(v) {
+      if (v >= 1000) return v.toLocaleString() + '%';
+      return v + '%';
+    }
+
+    function setFilter(rarity, btn) {
+      currentFilter = rarity;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderPets();
+    }
+
+    function renderPets() {
+      const q    = document.getElementById('searchInput').value.toLowerCase().trim();
+      const sort = document.getElementById('sortSelect').value;
+
+      let filtered = ALL_PETS.filter(p => {
+        const matchRarity = currentFilter === 'all' || p.rarity === currentFilter;
+        const matchSearch = p.name.toLowerCase().includes(q);
+        return matchRarity && matchSearch;
+      });
+
+      filtered.sort((a, b) => {
+        if (sort === 'value-desc') return b.value - a.value;
+        if (sort === 'value-asc')  return a.value - b.value;
+        if (sort === 'name-asc')   return a.name.localeCompare(b.name);
+        if (sort === 'name-desc')  return b.name.localeCompare(a.name);
+        return 0;
+      });
+
+      const grid  = document.getElementById('petsGrid');
+      const noRes = document.getElementById('noResults');
+      const info  = document.getElementById('resultsInfo');
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '';
+        noRes.style.display = 'block';
+        info.textContent = 'No pets found';
+        return;
+      }
+
+      noRes.style.display = 'none';
+      info.textContent = `Showing ${filtered.length} pet${filtered.length !== 1 ? 's' : ''}`;
+
+      grid.innerHTML = filtered.map(p => `
+        <div class="pet-card ${cardRarityClass(p.rarity)}">
+          <div class="pet-img-wrap">
+            <div class="pet-img-placeholder ph-${p.rarity.toLowerCase()}">${p.name.split(' ').map(w => w[0]).join('')}</div>
+          </div>
+          <div class="pet-name">${p.name}</div>
+          <span class="rarity-tag ${rarityClass(p.rarity)}">${p.rarity}</span>
+          ${p.note ? `<div style="font-size:0.68rem;color:var(--pink);font-weight:700;margin-bottom:6px;">${p.note}</div>` : ''}
+          <div class="pet-value">${formatValue(p.value)}</div>
+          ${p.shiny_value !== null && p.shiny_value !== undefined
+            ? `<div class="pet-value-shiny">Shiny: ${formatValue(p.shiny_value)}</div>` : ''}
+          <div class="pet-value-label">Trade Value</div>
+        </div>
+      `).join('');
+    }
+
+    function filterPets() { renderPets(); }
+
+    async function loadPets() {
+      const grid = document.getElementById('petsGrid');
+      grid.innerHTML = '<div style="color:var(--muted);font-size:0.875rem;padding:20px;grid-column:1/-1;">Loading...</div>';
+      try {
+        const res = await fetch(`${API}/api/pets/?sort=value_desc`);
+        ALL_PETS  = await res.json();
+        renderPets();
+      } catch (e) {
+        grid.innerHTML = '<div style="color:var(--muted);font-size:0.875rem;padding:20px;grid-column:1/-1;">Could not connect to API. Make sure the backend is running on port 8000.</div>';
+      }
+    }
+
+    loadPets();
+  </script>
+
+</body>
+</html>
